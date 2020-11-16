@@ -3,13 +3,15 @@ import torch
 
 from craft import CRAFT
 from test import str2bool, copyStateDict
-
+from dataset_loader import CheckDataset
 
 parser = argparse.ArgumentParser(description="CRAFT Fine Tuning")
 parser.add_argument('--trained_model', default='weights/craft_mlt_25k.pth', type=str, help='pretrained model')
 parser.add_argument('--num_of_epochs', default=2, type=int)
 parser.add_argument('--cuda', default=True, type=str2bool)
 parser.add_argument('--step_to_show', default=2000, type=int)
+parser.add_argument('--anns', default='C:/Users/denis/Desktop/probation/ann', type=str)
+parser.add_argument('--images', default='C:/Users/denis/Desktop/probation/train', type=str)
 
 args = parser.parse_args()
 
@@ -25,7 +27,7 @@ if __name__ == '__main__':
 
     # create dataloader
     # TODO: Create dataloader by creating another class. Then use Dataloader for batching
-    trainloader = None
+    trainloader = CheckDataset(args.anns, args.images)
 
     # define loss and optimizer
     # TODO: Create loss function mb class

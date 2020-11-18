@@ -53,7 +53,7 @@ parser.add_argument('--canvas_size', default=1280, type=int, help='image size fo
 parser.add_argument('--mag_ratio', default=1.5, type=float, help='image magnification ratio')
 parser.add_argument('--poly', default=False, action='store_true', help='enable polygon type')
 parser.add_argument('--show_time', default=False, action='store_true', help='show processing time')
-parser.add_argument('--test_folder', default='C:/Users/denis/Desktop/probation/test/images/', type=str, help='folder path to input images')
+parser.add_argument('--test_folder', default='data/', type=str, help='folder path to input images')
 parser.add_argument('--refine', default=True, action='store_true', help='enable link refiner')
 # 'weights/craft_refiner_CTW1500.pth'
 # 'experiments/experiment_2ep_16bs/refine_net.pth'
@@ -165,17 +165,17 @@ if __name__ == '__main__':
         bboxes, polys, score_text, resized_shape = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
 
         # save pred data for mAP
-        h, w = resized_shape[:2]
-        new_s = 256
-        h_rat = new_s / h
-        w_rat = new_s / w
-        filename, file_ext = os.path.splitext(os.path.basename(image_path))
-        with open(args.pred_dir_mAP + '/' + filename + '.txt', 'w') as f:
-            if not isinstance(bboxes, list):
-                for i in range(bboxes.shape[0]):
-                    s = 'text 1 ' + str(bboxes[i, 0, 0] * w_rat) + ' ' + str(bboxes[i, 0, 1] * h_rat) + ' ' \
-                        + str(bboxes[i, 2, 0] * w_rat) + ' ' + str(bboxes[i, 2, 1] * h_rat) + '\n'
-                    f.write(s)
+        # h, w = resized_shape[:2]
+        # new_s = 256
+        # h_rat = new_s / h
+        # w_rat = new_s / w
+        # filename, file_ext = os.path.splitext(os.path.basename(image_path))
+        # with open(args.pred_dir_mAP + '/' + filename + '.txt', 'w') as f:
+        #     if not isinstance(bboxes, list):
+        #         for i in range(bboxes.shape[0]):
+        #             s = 'text 1 ' + str(bboxes[i, 0, 0] * w_rat) + ' ' + str(bboxes[i, 0, 1] * h_rat) + ' ' \
+        #                 + str(bboxes[i, 2, 0] * w_rat) + ' ' + str(bboxes[i, 2, 1] * h_rat) + '\n'
+        #             f.write(s)
 
         # save score text
         filename, file_ext = os.path.splitext(os.path.basename(image_path))

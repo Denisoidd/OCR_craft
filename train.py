@@ -1,7 +1,6 @@
 import argparse
 import torch
 
-from torchnet.meter import mAPMeter
 from torch.utils.data import DataLoader
 from torch import optim
 from torchvision import transforms
@@ -12,7 +11,7 @@ from transformers import Rescale, ToTensor
 
 parser = argparse.ArgumentParser(description="CRAFT Fine Tuning")
 parser.add_argument('--trained_model', default='weights/craft_mlt_25k.pth', type=str, help='pretrained model')
-parser.add_argument('--num_of_epochs', default=10, type=int)
+parser.add_argument('--num_of_epochs', default=1, type=int)
 parser.add_argument('--cuda', default=True, type=str2bool)
 parser.add_argument('--tr_anns', default='C:/Users/denis/Desktop/probation/train/ann/', type=str)
 parser.add_argument('--tr_images', default='C:/Users/denis/Desktop/probation/train/images', type=str)
@@ -21,6 +20,7 @@ parser.add_argument('--v_images', default='C:/Users/denis/Desktop/probation/val/
 parser.add_argument('--b_s', default=16, type=int)
 parser.add_argument('--val_b_s', default=32, type=int)
 parser.add_argument('--freeze', default=True, type=bool)
+parser.add_argument('--save_path', default='experiments/fine_tuned_model_1ep.pth')
 
 args = parser.parse_args()
 
@@ -117,5 +117,9 @@ if __name__ == '__main__':
             # show and save current train loss
             val_loss.append(running_val_loss / len(valid_loader))
             print('%d epoch validation loss: %.8f' % (epoch + 1, running_val_loss / len(valid_loader)))
+
+        print("Saving the model")
+        # saving the model
+        torch.save(net.state_dict(), args.save_path)
 
     print('Finished Training')

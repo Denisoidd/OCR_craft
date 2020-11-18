@@ -53,9 +53,10 @@ parser.add_argument('--canvas_size', default=1280, type=int, help='image size fo
 parser.add_argument('--mag_ratio', default=1.5, type=float, help='image magnification ratio')
 parser.add_argument('--poly', default=False, action='store_true', help='enable polygon type')
 parser.add_argument('--show_time', default=False, action='store_true', help='show processing time')
-parser.add_argument('--test_folder', default='data/', type=str, help='folder path to input images')
+parser.add_argument('--test_folder', default='C:/Users/denis/Desktop/probation/test/images/', type=str, help='folder path to input images')
 parser.add_argument('--refine', default=True, action='store_true', help='enable link refiner')
 parser.add_argument('--refiner_model', default='weights/craft_refiner_CTW1500.pth', type=str, help='pretrained refiner model')
+parser.add_argument('--pred_dir_mAP', default='input/detection-results', type=str)
 
 args = parser.parse_args()
 
@@ -116,7 +117,7 @@ def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly, r
 
     if args.show_time : print("\ninfer/postproc time : {:.3f}/{:.3f}".format(t0, t1))
 
-    return boxes, polys, ret_score_text
+    return boxes, polys, ret_score_text, image.shape
 
 
 if __name__ == '__main__':
@@ -159,16 +160,20 @@ if __name__ == '__main__':
         print("Test image {:d}/{:d}: {:s}".format(k+1, len(image_list), image_path), end='\n')
         image = imgproc.loadImage(image_path)
 
-        bboxes, polys, score_text = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
+        bboxes, polys, score_text, resized_shape = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly, refine_net)
 
         # save pred data for mAP
+        h, w = resized_shape[:2]
+        new_s = 256
+        h_rat = new_s / h
+        w_rat = new_s / w
         filename, file_ext = os.path.splitext(os.path.basename(image_path))
-        pred_dir = 'input/detection-results'
-        gt_dir = 'input/ground-truth'
-        with open(pred_dir + '/' + filename + '.txt', 'w') as f:
-            for i in range(bboxes.shape[0]):
-                s = 'text ' + str(bboxes[i, 0, 0]) + ' ' + str(bboxes[i, 0, 1]) + ' ' + str(bboxes[i, 2, 0]) + ' ' + str(bboxes[i, 2, 1]) + '\n'
-                f.write(s)
+        with open(args.pred_dir_mAP + '/' + filename + '.txt', 'w') as f:
+            if not isinstance(bboxes, list):
+                for i in range(bboxes.shape[0]):
+                    s = 'text 1 ' + str(bboxes[i, 0, 0] * w_rat) + ' ' + str(bboxes[i, 0, 1] * h_rat) + ' ' \
+                        + str(bboxes[i, 2, 0] * w_rat) + ' ' + str(bboxes[i, 2, 1] * h_rat) + '\n'
+                    f.write(s)
 
         # save score text
         filename, file_ext = os.path.splitext(os.path.basename(image_path))

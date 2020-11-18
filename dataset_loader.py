@@ -37,7 +37,8 @@ class CheckDataset(Dataset):
 
         img_name = os.path.join(self.im_dir, self.anns[idx][:-5])
         image = io.imread(img_name)
-        heatmap = create_word_heatmap(parse_regions(os.path.join(self.ann_dir, self.anns[idx])), image.shape)
+        landmarks = parse_regions(os.path.join(self.ann_dir, self.anns[idx]))
+        heatmap = create_word_heatmap(landmarks, image.shape)
         sample = {'image': image, 'heatmap': heatmap}
 
         if self.transform:

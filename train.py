@@ -17,10 +17,14 @@ parser.add_argument('--tr_anns', default='C:/Users/denis/Desktop/probation/train
 parser.add_argument('--tr_images', default='C:/Users/denis/Desktop/probation/train/images', type=str)
 parser.add_argument('--v_anns', default='C:/Users/denis/Desktop/probation/val/ann/', type=str)
 parser.add_argument('--v_images', default='C:/Users/denis/Desktop/probation/val/images', type=str)
+parser.add_argument('--t_anns', default='C:/Users/denis/Desktop/probation/test/ann/', type=str)
+parser.add_argument('--t_images', default='C:/Users/denis/Desktop/probation/test/images', type=str)
 parser.add_argument('--b_s', default=16, type=int)
 parser.add_argument('--val_b_s', default=32, type=int)
 parser.add_argument('--freeze', default=True, type=bool)
-parser.add_argument('--save_path', default='experiments/fine_tuned_model_1ep.pth')
+parser.add_argument('--save_path', default='experiments/fine_tuned_model_1ep.pth', type=str)
+parser.add_argument('--create_test_mAP', default=True, type=bool)
+parser.add_argument('--gt_dir_mAP', default='input/ground-truth', type=str)
 
 args = parser.parse_args()
 
@@ -30,6 +34,28 @@ if __name__ == '__main__':
     if args.cuda:
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print("Your device is", device)
+
+    # create test mAP data
+    if args.create_test_mAP:
+        # create test dataloader
+        test_dataset = CheckDataset(args.t_anns, args.t_images,
+                                    transforms.Compose([Rescale((256, 256)), ToTensor()]))
+        test_loader = DataLoader(test_dataset, batch_size=args.b_s)
+        print("Test dataset is initialized")
+
+        with torch.no_grad():
+            for i, data in enumerate(test_loader, 0):
+                # get the data from dataloader and move it to gpu
+                landmarks = data['landmarks'].to(device)
+
+        # # save pred data for mAP
+        # filename, file_ext = os.path.splitext(os.path.basename(image_path))
+        #
+        # with open(args.gt_dir_mAP + '/' + filename + '.txt', 'w') as f:
+        #     for i in range(bboxes.shape[0]):
+        #         s = 'text ' + str(bboxes[i, 0, 0]) + ' ' + str(bboxes[i, 0, 1]) + ' ' + str(
+        #             bboxes[i, 2, 0]) + ' ' + str(bboxes[i, 2, 1]) + '\n'
+        #         f.write(s)
 
     # load net and move it to device
     net = CRAFT().float()

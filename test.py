@@ -42,8 +42,8 @@ def str2bool(v):
     return v.lower() in ("yes", "y", "true", "t", "1")
 
 parser = argparse.ArgumentParser(description='CRAFT Text Detection')
-#'weights/craft_mlt_25k.pth'
-#experiments/fine_tuned_model_1ep.pth
+# 'weights/craft_mlt_25k.pth'
+# 'experiments/experiment_2ep_16bs/net.pth'
 parser.add_argument('--trained_model', default='weights/craft_mlt_25k.pth', type=str, help='pretrained model')
 parser.add_argument('--text_threshold', default=0.7, type=float, help='text confidence threshold')
 parser.add_argument('--low_text', default=0.4, type=float, help='text low-bound score')
@@ -55,7 +55,9 @@ parser.add_argument('--poly', default=False, action='store_true', help='enable p
 parser.add_argument('--show_time', default=False, action='store_true', help='show processing time')
 parser.add_argument('--test_folder', default='C:/Users/denis/Desktop/probation/test/images/', type=str, help='folder path to input images')
 parser.add_argument('--refine', default=True, action='store_true', help='enable link refiner')
-parser.add_argument('--refiner_model', default='weights/craft_refiner_CTW1500.pth', type=str, help='pretrained refiner model')
+# 'weights/craft_refiner_CTW1500.pth'
+# 'experiments/experiment_2ep_16bs/refine_net.pth'
+parser.add_argument('--refiner_model', default='experiments/experiment_10ep_16bs_105lr/refine_net.pth', type=str, help='pretrained refiner model')
 parser.add_argument('--pred_dir_mAP', default='input/detection-results', type=str)
 
 args = parser.parse_args()
